@@ -2,7 +2,7 @@ import turtle
 import time
 import random
 
-delay = 0.5
+delay = 0.1
 
 # set up screen
 
@@ -37,23 +37,25 @@ segments = []  # when the player touchees the food we add a segment
 # functions
 
 def go_up():
-    head.direction = "up"
-    print("up")
+    if head.direction != "down": #this prevents going up then down or vice versa
+        head.direction = "up"
 
 
 def go_down():
-    head.direction = "down"
-    print("down")
+    if head.direction != "up":
+        head.direction = "down"
 
 
 def go_left():
-    head.direction = "left"
-    print("left")
+    if head.direction != "right":
+        head.direction = "left"
+
 
 
 def go_right():
-    head.direction = "right"
-    print("right")
+    if head.direction != "left":
+        head.direction = "right"
+
 
 
 def move():
@@ -84,6 +86,22 @@ windowObject.onkeypress(go_right, "d")
 # main game loop
 while True:
     windowObject.update()
+
+
+    #check for a collison with the border
+    if head.xcor() > 290 or head.xcor() < -290 or head.ycor()>290 or head.ycor()<-290:
+        time.sleep(1)
+        head.goto(0,0)
+        head.direction ="stop"
+
+
+        # hide the elements
+        for segment in segments:
+            segment.goto(1000, 1000)
+
+        # clear the segment list
+        segments.clear()
+
     if head.distance(food) < 20:  # we choose 20 becasue the food circle by defualt is 20 pixels x 20 pixels
         # so if the it is less than 20 that means we went inside it (collision)
         # that means they colided and move the food to a randowm spot
@@ -101,7 +119,7 @@ while True:
         segments.append(new_segment)
 
     # move the end segments first in reverse order
-    #here works if there is more than one segment in the segments list
+    # here works if there is more than one segment in the segments list
     for index in range(len(segments) - 1, 0, -1):  # decrements by 1 till 0
         x = segments[index - 1].xcor()
 
@@ -111,12 +129,27 @@ while True:
 
     # move segment 0 to where the head is
 
-    if len(segments) > 0: #it takes the coordinates of the head and give it to the first element of the array
+    if len(segments) > 0:  # it takes the coordinates of the head and give it to the first element of the array
         x = head.xcor()
         y = head.ycor()
         segments[0].goto(x, y)
 
     move()
+
+    # check for head collosion with body segments
+    for segment in segments:
+        if segment.distance(head) < 20:
+            time.sleep(1)
+            head.goto(0, 0)
+            head.direction = "stop"
+
+            # hide the elements
+            for segment in segments:
+                segment.goto(1000, 1000)
+
+            # clear the segment list
+            segments.clear()
+
     time.sleep(delay)
 
 windowObject.mainloop()  # this will keep windows open

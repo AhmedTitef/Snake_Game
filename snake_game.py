@@ -4,14 +4,16 @@ import random
 
 delay = 0.1
 
+# Score
+score = 0
+high_score = 0
+
 # set up screen
-
-
-windowObject = turtle.Screen()
-windowObject.title("Snake Game")
-windowObject.bgcolor("green")
-windowObject.setup(width=600, height=600)
-windowObject.tracer(0)  # turns off animation (screen updates)
+window_object = turtle.Screen()
+window_object.title("Snake Game")
+window_object.bgcolor("green")
+window_object.setup(width=600, height=600)
+window_object.tracer(0)  # turns off animation (screen updates)
 
 # create snake head
 head = turtle.Turtle()
@@ -33,11 +35,21 @@ food.goto(0, 100)  # start in center of screen
 # body segments
 segments = []  # when the player touchees the food we add a segment
 
+# pen
+pen = turtle.Turtle()
+pen.speed(0)
+pen.shape("square")
+pen.color("white")
+pen.penup()
+pen.hideturtle()
+pen.goto(0, 260)
+pen.write("Score: 0 High Score = 0", align="center", font=("Courier", 24, "normal"))
+
 
 # functions
 
 def go_up():
-    if head.direction != "down": #this prevents going up then down or vice versa
+    if head.direction != "down":  # this prevents going up then down or vice versa
         head.direction = "up"
 
 
@@ -51,11 +63,9 @@ def go_left():
         head.direction = "left"
 
 
-
 def go_right():
     if head.direction != "left":
         head.direction = "right"
-
 
 
 def move():
@@ -77,23 +87,21 @@ def move():
 
 
 # keyboard binding it connects a keypress to a function
-windowObject.listen()
-windowObject.onkeypress(go_up, "w")  # keypress takees a function with no argument thats why there is no paratethees
-windowObject.onkeypress(go_down, "s")
-windowObject.onkeypress(go_left, "a")
-windowObject.onkeypress(go_right, "d")
+window_object.listen()
+window_object.onkeypress(go_up, "w")  # keypress takees a function with no argument thats why there is no paratethees
+window_object.onkeypress(go_down, "s")
+window_object.onkeypress(go_left, "a")
+window_object.onkeypress(go_right, "d")
 
 # main game loop
 while True:
-    windowObject.update()
+    window_object.update()
 
-
-    #check for a collison with the border
-    if head.xcor() > 290 or head.xcor() < -290 or head.ycor()>290 or head.ycor()<-290:
+    # check for a collison with the border
+    if head.xcor() > 290 or head.xcor() < -290 or head.ycor() > 290 or head.ycor() < -290:
         time.sleep(1)
-        head.goto(0,0)
-        head.direction ="stop"
-
+        head.goto(0, 0)
+        head.direction = "stop"
 
         # hide the elements
         for segment in segments:
@@ -101,6 +109,11 @@ while True:
 
         # clear the segment list
         segments.clear()
+
+        # Reset the score
+        score = 0
+        pen.clear()
+        pen.write("Score: {} High Score: {}".format(score, high_score), align="center", font=("Courier", 24, "normal"))
 
     if head.distance(food) < 20:  # we choose 20 becasue the food circle by defualt is 20 pixels x 20 pixels
         # so if the it is less than 20 that means we went inside it (collision)
@@ -117,6 +130,14 @@ while True:
         new_segment.color("grey")
         new_segment.penup()
         segments.append(new_segment)
+
+        # increase the score
+        score += 10
+
+        if score > high_score:
+            high_score = score
+        pen.clear()
+        pen.write("Score: {} High Score: {}".format(score, high_score), align="center", font=("Courier", 24, "normal"))
 
     # move the end segments first in reverse order
     # here works if there is more than one segment in the segments list
@@ -150,6 +171,12 @@ while True:
             # clear the segment list
             segments.clear()
 
+            # Reset the score
+            score = 0
+            pen.clear()
+            pen.write("Score: {} High Score: {}".format(score, high_score), align="center",
+                      font=("Courier", 24, "normal"))
+
     time.sleep(delay)
 
-windowObject.mainloop()  # this will keep windows open
+window_object.mainloop()  # this will keep windows open
